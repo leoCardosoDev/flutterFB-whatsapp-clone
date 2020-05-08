@@ -7,10 +7,12 @@ void main() {
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
     home: LoginScreen(),
+    theme: ThemeData(
+      primaryColor: Color(0xff075e54),
+      accentColor: Color(0xff25d366),
+    ),
   ));
 
-  Firestore.instance.collection('users').document().setData({
-    'text' : 'Hello World!'
-  });
+
 
 }
