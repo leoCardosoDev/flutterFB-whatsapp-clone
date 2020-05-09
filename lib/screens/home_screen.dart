@@ -49,10 +49,21 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     Navigator.pushReplacementNamed(context, RouteGenerator.ROUTE_LOGIN);
   }
 
+  Future _verifierUserLogin() async {
+    FirebaseAuth auth = FirebaseAuth.instance;
+    FirebaseUser _userLogin = await auth.currentUser();
+
+    if (_userLogin == null) {
+      Navigator.pushReplacementNamed(context, RouteGenerator.ROUTE_LOGIN);
+    }
+  }
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+
+    _verifierUserLogin();
 
     _getCurrentUser();
 

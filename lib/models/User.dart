@@ -1,9 +1,12 @@
 
 class User{
 
+  String _uid;
   String _name;
   String _email;
   String _password;
+  String _photo;
+
 
   User();
 
@@ -14,6 +17,13 @@ class User{
     };
 
     return map;
+  }
+
+
+  String get uid => _uid;
+
+  set uid(String value) {
+    _uid = value;
   }
 
   String get password => _password;
@@ -32,6 +42,12 @@ class User{
 
   set name(String value) {
     _name = value;
+  }
+
+  String get photo => _photo;
+
+  set photo(String value) {
+    _photo = value;
   }
 
 }

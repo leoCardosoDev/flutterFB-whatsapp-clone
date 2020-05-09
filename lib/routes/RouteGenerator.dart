@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:whatscloneapp/screens/config_screen.dart';
 import 'package:whatscloneapp/screens/home_screen.dart';
 import 'package:whatscloneapp/screens/login_screen.dart';
+import 'package:whatscloneapp/screens/message_screen.dart';
 import 'package:whatscloneapp/screens/register_screen.dart';
 
 class RouteGenerator {
@@ -10,8 +11,12 @@ class RouteGenerator {
   static const String ROUTE_REGISTER = "/register";
   static const String ROUTE_HOME = "/home";
   static const String ROUTE_CONFIG = "/config";
+  static const String ROUTE_MESSAGE = "/message";
 
   static Route<dynamic> generatorRoutes(RouteSettings settings) {
+
+    final args = settings.arguments;
+
     switch (settings.name) {
       case ROUTE_BASE:
         return MaterialPageRoute(builder: (_) => LoginScreen());
@@ -31,6 +36,10 @@ class RouteGenerator {
 
       case ROUTE_CONFIG:
         return MaterialPageRoute(builder: (_) => ConfigScreen());
+        break;
+
+      case ROUTE_MESSAGE:
+        return MaterialPageRoute(builder: (_) => MessageScreen(args));
         break;
 
       default:

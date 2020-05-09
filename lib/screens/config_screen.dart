@@ -79,7 +79,7 @@ class _ConfigScreenState extends State<ConfigScreen> {
   _updateUrlImage(String url) {
     Firestore db = Firestore.instance;
 
-    Map<String, dynamic> dataUpadated = {'urlPerfilImage': url};
+    Map<String, dynamic> dataUpadated = {'photo': url};
 
     db.collection('users').document(_idUserIn).updateData(dataUpadated);
   }
@@ -104,9 +104,9 @@ class _ConfigScreenState extends State<ConfigScreen> {
     Map<String, dynamic> data = snapshot.data;
     _controllerName.text = data['name'];
 
-    if (data['urlPerfilImage'] != null) {
+    if (data['photo'] != null) {
       setState(() {
-        _urlImage = data['urlPerfilImage'];
+        _urlImage = data['photo'];
       });
     }
   }
