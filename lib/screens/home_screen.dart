@@ -34,7 +34,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   _selectMenuItem (String selectedItem){
     switch(selectedItem){
       case "Configurações":
-        print("Configurações");
+        Navigator.pushNamed(context, RouteGenerator.ROUTE_CONFIG);
         break;
       case "Sair":
         _logoutUser();
