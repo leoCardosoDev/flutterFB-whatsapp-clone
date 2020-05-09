@@ -2,8 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:whatscloneapp/models/User.dart';
-import 'package:whatscloneapp/screens/home_screen.dart';
-import 'package:whatscloneapp/screens/register_screen.dart';
+import 'package:whatscloneapp/routes/RouteGenerator.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -57,8 +56,7 @@ class _LoginScreenState extends State<LoginScreen> {
     auth
         .signInWithEmailAndPassword(email: user.email, password: user.password)
         .then((firebaseUser) {
-      Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => HomeScreen()));
+      Navigator.pushReplacementNamed(context, RouteGenerator.ROUTE_HOME);
     }).catchError((error) {
       setState(() {
         _messageError =
@@ -72,11 +70,7 @@ class _LoginScreenState extends State<LoginScreen> {
     FirebaseUser _userLogin = await auth.currentUser();
 
     if (_userLogin != null) {
-      Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => HomeScreen(),
-          ));
+      Navigator.pushReplacementNamed(context, RouteGenerator.ROUTE_HOME);
     }
   }
 
@@ -167,11 +161,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       style: TextStyle(color: Colors.white),
                     ),
                     onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => RegisterScreen(),
-                          ));
+                      Navigator.pushNamed(context, RouteGenerator.ROUTE_REGISTER);
                     },
                   ),
                 ),

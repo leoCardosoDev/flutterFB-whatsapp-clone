@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:whatscloneapp/screens/login_screen.dart';
+import 'package:whatscloneapp/routes/RouteGenerator.dart';
 import 'package:whatscloneapp/screens/tabs/contacts_tab.dart';
 import 'package:whatscloneapp/screens/tabs/conversation_tab.dart';
 
@@ -46,9 +46,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     FirebaseAuth auth = FirebaseAuth.instance;
     await auth.signOut();
 
-    Navigator.pushReplacement(context, MaterialPageRoute(
-      builder: (context) => LoginScreen(),
-    ));
+    Navigator.pushReplacementNamed(context, RouteGenerator.ROUTE_LOGIN);
   }
 
   @override

@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:whatscloneapp/models/User.dart';
-import 'package:whatscloneapp/screens/home_screen.dart';
+import 'package:whatscloneapp/routes/RouteGenerator.dart';
 
 class RegisterScreen extends StatefulWidget {
   @override
@@ -12,12 +12,9 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   // Controllers
-  TextEditingController _controllerName =
-      TextEditingController();
-  TextEditingController _controllerEmail =
-      TextEditingController();
-  TextEditingController _controllerPassword =
-      TextEditingController();
+  TextEditingController _controllerName = TextEditingController();
+  TextEditingController _controllerEmail = TextEditingController();
+  TextEditingController _controllerPassword = TextEditingController();
 
   String _messageError = "";
 
@@ -72,15 +69,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
         .createUserWithEmailAndPassword(
             email: user.email, password: user.password)
         .then((firebaseUser) {
+      Firestore db = Firestore.instance;
 
-          Firestore db = Firestore.instance;
-
-          db.collection('users')
+      db
+          .collection('users')
           .document(firebaseUser.user.uid)
           .setData(user.toMap());
-
-      Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => HomeScreen()));
+      Navigator.pushNamedAndRemoveUntil(
+          context, RouteGenerator.ROUTE_HOME, (_) => false);
     }).catchError((error) {
       setState(() {
         _messageError = "Erro ao cadastrar " + error.toString();
