@@ -1,5 +1,9 @@
+import 'dart:async';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:whatscloneapp/models/Conversation.dart';
+import 'package:whatscloneapp/models/User.dart';
+import 'package:whatscloneapp/routes/RouteGenerator.dart';
 
 class ConversationTab extends StatefulWidget {
   @override
@@ -8,63 +12,114 @@ class ConversationTab extends StatefulWidget {
 
 class _ConversaTabState extends State<ConversationTab> {
 
-  List<Conversation> listTalk = [
-    Conversation(
-      "Leonardo Cardoso",
-      "Olá Priscila! Tudo Bem?",
-      "https://firebasestorage.googleapis.com/v0/b/whatsapp-clone-ed3d4.appspot.com/o/perfil%2Fperfil5.jpg?alt=media&token=efd21a05-71c9-4456-876f-794543c0ae8d"
-    ),
+  Firestore db = Firestore.instance;
+  String idUserIn;
+  final _controllerStream = StreamController<QuerySnapshot>.broadcast();
 
-    Conversation(
-        "Priscila ",
-        "Oi Leozinho meu amor! Estou bem e você?",
-        "https://firebasestorage.googleapis.com/v0/b/whatsapp-clone-ed3d4.appspot.com/o/perfil%2Fperfil1.jpg?alt=media&token=823de68b-f8de-48b4-8f13-8903bee2e27b"
-    ),
+  Stream<QuerySnapshot> addListenerConversation(){
+    final stream = db
+        .collection('conversations')
+        .document(idUserIn)
+        .collection('lastConversation')
+        .snapshots();
 
-    Conversation(
-        "Joao Maria",
-        "Ei main",
-        "https://firebasestorage.googleapis.com/v0/b/whatsapp-clone-ed3d4.appspot.com/o/perfil%2Fperfil4.jpg?alt=media&token=9b8a8c0a-fe0c-4e4a-8ccb-8138b695e894"
-    ),
+    stream.listen((datas){
+      _controllerStream.add(datas);
+    });
+  }
 
-    Conversation(
-        "José Felipe",
-        "Hello World",
-        "https://firebasestorage.googleapis.com/v0/b/whatsapp-clone-ed3d4.appspot.com/o/perfil%2Fperfil3.jpg?alt=media&token=33717346-59bb-43b4-a9bf-7778c6e5d930"
-    ),
+  Future _getDataUser() async {
+    FirebaseAuth auth = FirebaseAuth.instance;
+    FirebaseUser userIn = await auth.currentUser();
+    idUserIn = userIn.uid;
+    addListenerConversation();
+  }
 
-    Conversation(
-        "Kamila Camila",
-        "Hello World",
-        "https://firebasestorage.googleapis.com/v0/b/whatsapp-clone-ed3d4.appspot.com/o/perfil%2Fperfil2.jpg?alt=media&token=1f9f8977-70ca-4412-b912-fffd5eefa978"
-    ),
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
 
-  ];
+    _getDataUser();
+
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    _controllerStream.close();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: listTalk.length,
-        itemBuilder: (context, index){
-        
-        Conversation talk = listTalk[index];
-        
-        return ListTile(
-          contentPadding: EdgeInsets.fromLTRB(14.0, 6.0, 14.0, 6.0),
-          leading: CircleAvatar(
-            maxRadius: 30,
-            backgroundColor: Colors.grey,
-            backgroundImage: NetworkImage(talk.photo),
-          ),
-          title: Text(
-            talk.name,
-            style: TextStyle(fontSize: 14.0, fontWeight: FontWeight.bold),
-          ),
-          subtitle: Text(
-            talk.message,
-            style: TextStyle(fontSize: 12.0, color: Colors.grey),
-          ),
-        );
-    });
+
+    return StreamBuilder<QuerySnapshot>(
+      stream: _controllerStream.stream,
+      builder: (context, snapshot){
+        switch(snapshot.connectionState){
+          case ConnectionState.none:
+          case ConnectionState.waiting:
+            return Center(
+              child: Column(
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text('Carregando conversas...'),
+                  ),
+                  CircularProgressIndicator(),
+                ],
+              ),
+            );
+            break;
+          default:
+            QuerySnapshot querySnapshot = snapshot.data;
+            if (snapshot.hasError) {
+              return Center(
+                  child: Text('Erro ao carregar mensagens'),
+              );
+            }else {
+              if(querySnapshot.documents.length == 0){
+                return Center(
+                  child: Text("Você não tem nenhuma conversa :( "),
+                );
+              }
+                return ListView.builder(
+                    itemCount: querySnapshot.documents.length,
+                    itemBuilder: (context, index) {
+
+                      List<DocumentSnapshot> conversations = querySnapshot.documents.toList();
+                      DocumentSnapshot talk = conversations[index];
+                      User user = User();
+                      user.name = talk['name'];
+                      user.photo = talk['photo'];
+                      user.uid = talk['idRecipient'];
+
+                      return ListTile(
+                        onTap: (){
+                          Navigator.pushNamed(context, RouteGenerator.ROUTE_MESSAGE, arguments: user);
+                        },
+                        contentPadding: EdgeInsets.fromLTRB(14.0, 6.0, 14.0, 6.0),
+                        leading: CircleAvatar(
+                          maxRadius: 30,
+                          backgroundColor: Colors.grey,
+                          backgroundImage: talk['photo'] != null ? NetworkImage(talk['photo']) : null,
+                        ),
+                        title: Text(
+                          talk['name'],
+                          style: TextStyle(
+                              fontSize: 14.0, fontWeight: FontWeight.bold),
+                        ),
+                        subtitle: Text(
+                          talk['type'] == 'image' ? 'Foto' : talk['message'],
+                          style: TextStyle(fontSize: 12.0, color: Colors.grey),
+                        ),
+                      );
+                });
+            }
+        } //fim switch
+      },
+    );
+
   }
 }

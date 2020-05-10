@@ -3,6 +3,7 @@ class Message {
   String _message;
   String _image;
   String _type;
+  String _date;
 
   Message();
 
@@ -11,7 +12,8 @@ class Message {
       "uid": this.uid,
       "message": this.message,
       "image": this.image,
-      "type": this.type
+      "type": this.type,
+      "date": this.date
     };
 
     return map;
@@ -40,4 +42,12 @@ class Message {
   set uid(String value) {
     _uid = value;
   }
+
+  String get date => _date;
+
+  set date(String value) {
+    _date = value;
+  }
+
+
 }
